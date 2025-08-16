@@ -1,0 +1,18 @@
+{
+    "books": [
+        {
+            "title": "mahmutabi",
+            "author": "mehmetabi",
+            "publication_year": 2020,
+            "isbn": "12345678911",
+            "status": "mevcut"
+        }
+    ],
+    "members": [
+        {
+            "name": "muco",
+            "member_id": 101,
+            "borrowed_isbns": []
+        }
+    ]
+}

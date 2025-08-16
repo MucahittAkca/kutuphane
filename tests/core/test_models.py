@@ -19,11 +19,11 @@ def test_book_borrow_and_return_logic():
     """Book sınıfının ödünç alma ve iade etme mantığını test eder."""
     book = Book(title="Dune", author="Frank Herbert", isbn="9780441013593", publication_year=1965)
 
-    # Başarılı ödünç alma
+    #Başarılı ödünç alma
     book.borrow_book()
     assert book.status == BookStatus.BORROWED
 
-    # Başarılı iade etme
+    #Başarılı iade etme
     book.return_book()
     assert book.status == BookStatus.AVAILABLE
 
@@ -32,7 +32,7 @@ def test_borrow_already_borrowed_book_fails():
     book = Book(title="Dune", author="Frank Herbert", isbn="9780441013593", publication_year=1965)
     book.borrow_book()
 
-    # İkinci kez ödünç almaya çalışıldığında ValueError
+    #İkinci kez ödünç almaya çalışıldığında ValueError
     with pytest.raises(ValueError) as excinfo:
         book.borrow_book()
     
