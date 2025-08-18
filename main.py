@@ -1,5 +1,6 @@
 from kutuphane_yonetim.core.library import Library
 from kutuphane_yonetim.core.models import Book, Member
+import asyncio
 
 
 def wait_for_user_input():
@@ -20,8 +21,8 @@ def print_menu():
     print("---------------------------------")
 
 
-def main():
-    library = Library(name="Proje Özel")
+async def main():
+    library = Library(name="Proje Özel", data_file="data/library.json")
 
     while True:
         print_menu()
@@ -30,12 +31,8 @@ def main():
         try:
             if choice == '1':
                 #Kitap Ekle
-                title = input("Kitap Adı: ")
-                author = input("Yazar: ")
                 isbn = input("ISBN: ")
-                year = int(input("Yayın Yılı: "))
-                new_book = Book(title=title, author=author, isbn=isbn, publication_year=year)
-                library.add_book(new_book)
+                await library.add_book(isbn=isbn)
 
             elif choice == '2':
                 #Kitap Sil
@@ -99,4 +96,8 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        asyncio.run(main())
+
+    except asyncio.CancelledError:
+        pass

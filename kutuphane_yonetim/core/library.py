@@ -1,6 +1,9 @@
 from .models import *
 import json
 from typing import List, Union
+import httpx
+
+OPEN_LIBRARY_URL = "https://openlibrary.org/search.json?isbn="
 
 class Library:
     def __init__(self, name, data_file="library.json"):
@@ -85,14 +88,52 @@ class Library:
 
 
     ### KİTAP METHODLARI ###
-    def add_book(self, book: Book):
-        """Kütüphaneye yeni bir kitap ekler."""
-        for existing_book in self._books:
-            if existing_book.isbn == book.isbn:
-                raise ValueError(f"ISBN: {book.isbn} zaten mevcut!")
-        self._books.append(book)
-        self._save_data()   
-        print(f"{book.title} başarıyla kütüphaneye eklendi.")
+    async def add_book(self, isbn: str):
+        """Verilen ISBN'i kullanarak Open Library API'sinden kitap bilgilerini çeker
+        ve kütüphaneye yeni bir Book nesnesi olarak ekler."""
+        if self.find_book(isbn=isbn):
+            raise ValueError(f"ISBN {isbn} zaten mevcut!")
+        
+        params = {"q": isbn}
+
+        try:
+            async with httpx.AsyncClient() as client:
+                response = await client.get(OPEN_LIBRARY_URL, params=params, follow_redirects=True)
+                response.raise_for_status()
+
+            data = response.json()
+
+            if not data.get("docs") or len(data["docs"]) == 0:
+                raise ValueError(f"ISBN {isbn} ile Open Library'de arama sonucu bulunamadı.")
+            
+            first_result = data["docs"][0]
+            title = first_result.get("title", "Başlık Bilinmiyor")
+            author = first_result.get("author_name", ["Yazar Bilinmiyor"])[0]
+            publication_year = first_result.get("first_publish_year", 9999)
+
+            print(f"{isbn} ile {data.get('numFound', 0)} sonuç bulundu.")
+            new_book = Book(
+                title=title,
+                author=author,
+                isbn=isbn,
+                publication_year=publication_year
+            )
+
+            self._books.append(new_book)
+            self._save_data()
+            print(f"İlk sıradaki sonuç eklendi: '{new_book.title}' by {new_book.author}")
+
+
+        except httpx.HTTPStatusError as e:
+            raise IOError(f"API isteği başarısız oldu: Sunucu hatası {e.response.status_code}")
+        
+        except httpx.RequestError:
+            raise IOError("Ağ hatası. Lütfen internet bağlantınızı kontrol edin.")
+        
+        except (KeyError, IndexError, TypeError):
+            raise IOError(f"API'den gelen veri formatı beklenmedik veya bozuk. ISBN: {isbn}")
+
+
 
     def find_book(self, *, isbn: str = None, title: str = None):
         """ISBN'e veya başlığa göre tek bir kitap bulur."""
