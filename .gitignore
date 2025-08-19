@@ -22,7 +22,6 @@ dist/
 
 Thumbs.db
 
-data/
 
 .env
 *.env

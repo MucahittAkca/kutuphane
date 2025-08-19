@@ -1,0 +1,27 @@
+{
+    "books": [
+        {
+            "title": "Neuromancer",
+            "author": "William Gibson",
+            "publication_year": 1984,
+            "isbn": "9780441569595",
+            "status": "mevcut",
+            "book_type": "book"
+        },
+        {
+            "title": "Nineteen Eighty-Four",
+            "author": "George Orwell",
+            "publication_year": 1949,
+            "isbn": "9780451524935",
+            "status": "mevcut",
+            "book_type": "book"
+        }
+    ],
+    "members": [
+        {
+            "name": "muco",
+            "member_id": 101,
+            "borrowed_isbns": []
+        }
+    ]
+}
