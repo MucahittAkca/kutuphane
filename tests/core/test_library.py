@@ -25,6 +25,17 @@ def library_with_data(empty_library):
 
 #Temel İşlev ve Hata Durumu Testleri
 
+
+def test_add_book_manually_and_find(empty_library):
+    """Manuel olarak bir Book nesnesi oluşturup kütüphaneye eklemeyi test eder."""
+    library = empty_library
+    book = Book(title="1984", author="George Orwell", isbn="9780451524935", publication_year=1949)
+    library.add_book(book) # MANUEL EKLEME METODU ÇAĞRILIYOR
+    
+    found_book = library.find_book(isbn="9780451524935")
+    assert found_book is not None
+    assert found_book.title == "1984"
+
 def test_register_and_find_member(empty_library):
     library = empty_library
     member = Member(name="Ahmet Çelik", member_id=202)
@@ -81,8 +92,8 @@ async def test_add_book_from_api_success(empty_library, httpx_mock):
     }
     httpx_mock.add_response(url=f"https://openlibrary.org/search.json?q={test_isbn}", json=mock_response)
     
-    await library.add_book(test_isbn)
-    
+    await library.add_book_from_api(test_isbn)
+
     found_book = library.find_book(isbn=test_isbn)
     assert found_book is not None
     assert found_book.title == "1984"
@@ -98,7 +109,7 @@ async def test_add_book_from_api_no_results_fails(empty_library, httpx_mock):
     httpx_mock.add_response(url=f"https://openlibrary.org/search.json?q={test_isbn}", json=mock_response)
     
     with pytest.raises(ValueError, match="arama sonucu bulunamadı"):
-        await library.add_book(test_isbn)
+        await library.add_book_from_api(test_isbn)
 
 @pytest.mark.asyncio
 async def test_add_duplicate_isbn_from_api_fails(empty_library):
@@ -110,10 +121,23 @@ async def test_add_duplicate_isbn_from_api_fails(empty_library):
     library._books.append(existing_book)
     
     with pytest.raises(ValueError, match="zaten mevcut"):
-        await library.add_book(test_isbn)
+        await library.add_book_from_api(test_isbn)
 
 
 #Veri Saklama Testleri
+
+
+def test_save_data_on_manual_add_book(empty_library):
+    """MANUEL kitap eklendiğinde JSON dosyasının güncellendiğini test eder."""
+    library = empty_library
+    book = Book(title="Fahrenheit 451", author="Ray Bradbury", isbn="9781451673319", publication_year=1953)
+    library.add_book(book) # Manuel ekleme
+    
+    with open(library.data_file, 'r', encoding='utf-8') as f:
+        data = json.load(f)
+        
+    assert len(data["books"]) == 1
+    assert data["books"][0]["title"] == "Fahrenheit 451"
 
 def test_save_data_on_register_member(empty_library):
     """Üye eklendiğinde JSON dosyasının güncellendiğini test eder."""

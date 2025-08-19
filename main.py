@@ -9,7 +9,8 @@ def wait_for_user_input():
 def print_menu():
     """Kullanıcıya menüyü gösterir."""
     print("\n--- Kütüphane Yönetim Sistemi ---")
-    print("1. Kitap Ekle")
+    print("0. Kitap Ekle")
+    print("1. API ile Kitap Ekle")
     print("2. Kitap Sil")
     print("3. Tüm Kitapları Listele")
     print("4. Kitap Ara")
@@ -29,10 +30,19 @@ async def main():
         choice = input("Lütfen bir işlem seçin (1-9): ")
 
         try:
-            if choice == '1':
-                #Kitap Ekle
+            if choice == "0":
+                #kitap ekle
+                title = input("Kitap Adı: ")
+                author = input("Yazar: ")
                 isbn = input("ISBN: ")
-                await library.add_book(isbn=isbn)
+                year = int(input("Yayın Yılı: "))
+                new_book = Book(title=title, author=author, isbn=isbn, publication_year=year)
+                library.add_book(new_book)
+
+            elif choice == '1':
+                #API ile Kitap Ekle
+                isbn = input("ISBN: ")
+                await library.add_book_from_api(isbn=isbn)
 
             elif choice == '2':
                 #Kitap Sil

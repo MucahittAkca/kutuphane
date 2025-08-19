@@ -1,0 +1,10 @@
+{
+    "books": [],
+    "members": [
+        {
+            "name": "Ayşe Yılmaz",
+            "member_id": 101,
+            "borrowed_isbns": []
+        }
+    ]
+}

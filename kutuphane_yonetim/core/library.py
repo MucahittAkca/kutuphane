@@ -88,7 +88,17 @@ class Library:
 
 
     ### KİTAP METHODLARI ###
-    async def add_book(self, isbn: str):
+    def add_book(self, book: Union[Book, EBook, AudioBook]):
+        """Kütüphaneye yeni bir kitap (veya alt türü) ekler."""
+        # ISBN'nin benzersiz olduğunu kontrol etmek iyi bir pratiktir.
+        for existing_book in self._books:
+            if existing_book.isbn == book.isbn:
+                raise ValueError(f"ISBN {book.isbn} zaten mevcut.")
+        self._books.append(book)
+        self._save_data()
+        print(f"'{book.title}' kütüphaneye eklendi.")
+
+    async def add_book_from_api(self, isbn: str):
         """Verilen ISBN'i kullanarak Open Library API'sinden kitap bilgilerini çeker
         ve kütüphaneye yeni bir Book nesnesi olarak ekler."""
         if self.find_book(isbn=isbn):
